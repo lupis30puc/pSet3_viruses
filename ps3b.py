@@ -55,19 +55,10 @@ class SimpleVirus(object):
         returns: True with probability self.getClearProb and otherwise returns
         False.
         """
-#        for hour in random
         if random.random() > self.clearProb:
             return False
         elif random.random() <= self.clearProb:
-            return True + self.clearProb
-            
-#        if self.clearProb in random.random():
-#            return True + self.clearProb
-#        else:
-#            return False
-        #Note that the mapping between time steps and actual time will vary depending 
-        #on the type of virus being considered, but for this problem set, think of a 
-        #time step as a simulated hour of time.
+            return True 
     
     def reproduce(self, popDensity):
         """
@@ -93,11 +84,9 @@ class SimpleVirus(object):
         
         RealBP = self.maxBirthProb * (1 - popDensity)
         if random.random() <= RealBP:
-            return print(SimpleVirus(BirthP, cleP))
-        else:
-            return print(NoChildException())
-    
-SimpleVirus(0.5, 0.1)
+            return SimpleVirus(BirthP, cleP)
+        elif random.random() > RealBP:
+            raise Exception(NoChildException)
 
 class Patient(object):
     """
@@ -117,8 +106,6 @@ class Patient(object):
         """
         self.viruses = viruses
         self.maxPop = maxPop
-#        SimpleVirus.__init__()
-        # TODO
 
     def getViruses(self):
         """
@@ -160,33 +147,37 @@ class Patient(object):
         """
         origViruses = self.viruses
         UpdtVirus = self.viruses.copy()
-#        UpdtVirus = []
+
         for v in origViruses:
-            print(v)
             if v.doesClear() == True:
                 UpdtVirus.remove(v)
-        print(UpdtVirus)
-#            else:
-#                UpdtVirus.append(v)
         popDensity = len(UpdtVirus) / self.maxPop
         finalVir = UpdtVirus.copy()
-#        origViruses = UpdtVirus
+
         for u in UpdtVirus:
-            print(u)
-            new = u.reproduce(popDensity)
             try:
-                finalVir.append(new)
-            except new == NoChildException():
+                new = u.reproduce(popDensity)
+#            try:
+                if new != None:
+                    finalVir.append(new)
+            except Exception:
                 pass
         self.viruses = finalVir
+        print(self.viruses)
         return len(self.viruses)     
-        # TODO
-viruses = [SimpleVirus(0.5, 0.1), SimpleVirus(0.7, 0.4), SimpleVirus(0.6, 0.1), SimpleVirus(0.2, 0.2), SimpleVirus(0.3, 0.6)]
+
+viruses = [SimpleVirus(0.5, 0.1), SimpleVirus(0.1, 0.4), SimpleVirus(0.6, 0.1), SimpleVirus(0.2, 0.2), SimpleVirus(0.3, 0.6)]
 maxPop = 30
 Bu = Patient(viruses, maxPop)
 Bu.getMaxPop()
 Bu.getTotalPop()
 #Bu.update()
+
+#new = X.reproduce(0.166)
+#if new == NoChildException():
+#    print('NochildException')
+#else:
+#    NewVir.append(new)
 
 #
 # PROBLEM 2
