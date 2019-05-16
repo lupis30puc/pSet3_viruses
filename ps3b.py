@@ -493,5 +493,51 @@ def simulationWithDrug(numViruses, maxPop, maxBirthProb, clearProb, resistances,
     numTrials: number of simulation runs to execute (an integer)
     
     """
+    timesteps = 150
+    viruses = []
+    avg_sizeVirus = []
+    avg_resistV = []
+    intentos = 0
+    for n in range(numViruses):
+#        viruses = []
+        viruses.append(ResistantVirus(maxBirthProb, clearProb, resistances, mutProb))
+        
+    for n in range(numTrials):
+#        print('ready to initiate Patient')
+        treatedPatient = TreatedPatient(viruses,maxPop)
+        veces = 0
+#        print('updating...')
+        while veces < timesteps:
+            sz = treatedPatient.update()
+            rs = treatedPatient.getResistPop('guttagonol')
+            if intentos == 0:
+                avg_sizeVirus.append(float(sz))
+                avg_resistV.append(float(rs))
+                veces += 1
+            else:
+                for s in avg_sizeVirus:
+                    s += float(sz)
+                for r in avg_resistV:
+                    r += float(r)
+                    veces += 1
+        intentos += 1
+#        print('ready to make avg')
+    for sz in avg_sizeVirus:
+         newSZ = sz / numTrials
+         sz = newSZ  
+    for rs in avg_resistV:
+         newRS = rs / numTrials
+         rs = newRS
+
+#    print(avg_sizeVirus)
+#    print('plotting...')
+    pylab.plot(avg_sizeVirus, label = "SimpleVirus")
+    pylab.plot(avg_resistV, label = "ResistantVirus" )
+    pylab.title("SimpleVirus and ResistantVirus simulation")
+    pylab.xlabel("Time Steps")
+    pylab.ylabel("Average of Virus and Resistant Virus Population")
+    pylab.legend(loc = "best")
+    pylab.show()
 
     # TODO
+#simulationWithDrug(100, 1000, 0.1, 0.05, {'guttagonol': False}, 0.005, 100)
