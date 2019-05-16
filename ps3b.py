@@ -2,6 +2,9 @@
 
 import random
 import pylab
+import matplotlib.pyplot as plt
+import numpy as np
+from ps3b_precompiled_37 import *
 
 ''' 
 Begin helper code
@@ -195,10 +198,46 @@ def simulationWithoutDrug(numViruses, maxPop, maxBirthProb, clearProb,
     clearProb: Maximum clearance probability (a float between 0-1)
     numTrials: number of simulation runs to execute (an integer)
     """
+    timesteps = 300
+    viruses = []
+    avg_sizeVirus = []
+    intentos = 0
+    for n in range(numViruses):
+        viruses.append(SimpleVirus(maxBirthProb, clearProb))
+#    print(viruses)
+    for n in range(numTrials):
+#        for n in range(numViruses):
+#            viruses.append(SimpleVirus(maxBirthProb, clearProb))
+#            print(viruses)
+        print('ready to initiate Patient')
+        patient = Patient(viruses,maxPop)
+        veces = 0
+        print('updating...')
+        while veces < timesteps:
+            sz = patient.update()
+            if intentos == 0:
+                avg_sizeVirus.append(sz)
+                veces += 1
+            else:
+                for s in avg_sizeVirus:
+                    s += sz
+                    veces += 1
+        intentos += 1
+        print('ready to make avg')
+    for sz in avg_sizeVirus:
+         newSZ = sz / numTrials
+         sz = newSZ  
 
-    # TODO
+    print(avg_sizeVirus)
+    print('plotting...')
+    pylab.plot(avg_sizeVirus, label = "SimpleVirus")
+    pylab.title("SimpleVirus simulation")
+    pylab.xlabel("Time Steps")
+    pylab.ylabel("Average Virus Population")
+    pylab.legend(loc = "best")
+    pylab.show()
 
-
+#simulationWithoutDrug(100, 1000, 0.1, 0.05, 100)
 
 #
 # PROBLEM 3
