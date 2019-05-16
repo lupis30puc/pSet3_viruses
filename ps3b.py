@@ -167,11 +167,11 @@ class Patient(object):
         self.viruses = finalVir
         return len(self.viruses)     
 
-viruses = [SimpleVirus(0.5, 0.1), SimpleVirus(0.1, 0.4), SimpleVirus(0.6, 0.1), SimpleVirus(0.2, 0.2), SimpleVirus(0.3, 0.6)]
-maxPop = 30
-Bu = Patient(viruses, maxPop)
-Bu.getMaxPop()
-Bu.getTotalPop()
+#viruses = [SimpleVirus(0.5, 0.1), SimpleVirus(0.1, 0.4), SimpleVirus(0.6, 0.1), SimpleVirus(0.2, 0.2), SimpleVirus(0.3, 0.6)]
+#maxPop = 30
+#Bu = Patient(viruses, maxPop)
+#Bu.getMaxPop()
+#Bu.getTotalPop()
 
 #
 # PROBLEM 2
@@ -340,7 +340,7 @@ class ResistantVirus(SimpleVirus):
         cleP = self.clearProb
         resistances = self.resistances
         mutProb = self.mutProb       
-#        newResi= resistances.copy()
+        newResi= resistances.copy()
         RealBP = self.maxBirthProb * (1 - popDensity)
         
         def mutation(resistances):
@@ -350,20 +350,18 @@ class ResistantVirus(SimpleVirus):
                 else:
                     resistances[k] = True
             return resistances
-#        for d in activeDrugs:
-#            if resistance[d] == True:
-        if all(resistances[d] == True for d in activeDrugs) or len(activeDrugs) == []:                          
+
+        if all(self.isResistantTo(d) for d in activeDrugs):                          
             if random.random() <= RealBP:
                 if random.random() > mutProb:
-                    return ResistantVirus(BirthP, cleP, resistances, mutProb)
+                    return ResistantVirus(BirthP, cleP, newResi, mutProb)
                 elif random.random() <= mutProb:
-                    newResi = mutation(resistances)
+                    newResi = mutation(newResi)
                     return ResistantVirus(BirthP, cleP, newResi, mutProb)
             elif random.random() > RealBP:
                 raise NoChildException
         else:
             raise NoChildException 
-        # TODO
 
        
 
@@ -384,8 +382,8 @@ class TreatedPatient(Patient):
 
         maxPop: The  maximum virus population for this patient (an integer)
         """
-
-        # TODO
+        Patient.__init__(self, viruses, maxPop)
+        self.drugs_taken = []
 
 
     def addPrescription(self, newDrug):
@@ -398,9 +396,9 @@ class TreatedPatient(Patient):
 
         postcondition: The list of drugs being administered to a patient is updated
         """
-
-        # TODO
-
+        exist_drugs = self.drugs_taken
+        if newDrug not in exist_drugs:
+            exist_drugs.append(newDrug)
 
     def getPrescriptions(self):
         """
@@ -409,9 +407,7 @@ class TreatedPatient(Patient):
         returns: The list of drug names (strings) being administered to this
         patient.
         """
-
-        # TODO
-
+        return self.drugs_taken
 
     def getResistPop(self, drugResist):
         """
@@ -424,8 +420,12 @@ class TreatedPatient(Patient):
         returns: The population of viruses (an integer) with resistances to all
         drugs in the drugResist list.
         """
-
-        # TODO
+        viruses = self.viruses
+        ResistPop = 0
+        for v in viruses:
+            if all(v.isResistantTo(d) for d in drugResist):
+                ResistPop += 1
+        return ResistPop
 
 
     def update(self):
@@ -448,10 +448,25 @@ class TreatedPatient(Patient):
         returns: The total virus population at the end of the update (an
         integer)
         """
+        origViruses = self.viruses
+        UpdtVirus = self.viruses.copy()
 
-        # TODO
+        for v in origViruses:
+            if v.doesClear() == True:
+                UpdtVirus.remove(v)
+        popDensity = len(UpdtVirus) / self.maxPop
+        finalVir = UpdtVirus.copy()
 
-
+        activeDrugs = self.drugs_taken
+        for u in UpdtVirus:
+            try:
+                new = u.reproduce(popDensity, activeDrugs)
+                if new != None:
+                    finalVir.append(new)
+            except NoChildException:
+                pass
+        self.viruses = finalVir
+        return len(self.viruses)     
 
 #
 # PROBLEM 4
